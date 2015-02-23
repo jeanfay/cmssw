@@ -78,6 +78,7 @@ class HLTEcalPhiSymFilter : public edm::EDFilter {
  double ampCut_endc_; 
  uint32_t statusThreshold_; ///< accept channels with up to this status
  bool   useRecoFlag_;       ///< use recoflag instead of DB for bad channels
+ bool   useConstantThreshold_;       ///< use constant threshold instead of DB one
 };
 
 #endif

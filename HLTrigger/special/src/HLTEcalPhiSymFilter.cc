@@ -3,6 +3,8 @@
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "CondFormats/EcalObjects/interface/EcalChannelStatus.h"
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
+#include "CondFormats/DataRecord/interface/EcalPhiSymThresholdsRcd.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
@@ -26,6 +28,7 @@ HLTEcalPhiSymFilter::HLTEcalPhiSymFilter(const edm::ParameterSet& iConfig)
   
   statusThreshold_ = iConfig.getParameter<uint32_t> ("statusThreshold");
   useRecoFlag_ =  iConfig.getParameter<bool>("useRecoFlag");
+  useConstantThreshold_ =  iConfig.getParameter<bool>("useConstantThreshold");
 
   barrelDigisToken_ = consumes<EBDigiCollection>(barrelDigis_);
   endcapDigisToken_ = consumes<EEDigiCollection>(endcapDigis_);
@@ -55,6 +58,7 @@ HLTEcalPhiSymFilter::fillDescriptions(edm::ConfigurationDescriptions& descriptio
   desc.add<edm::InputTag>("endcapHitCollection",edm::InputTag("ecalRecHit","EcalRecHitsEE"));
   desc.add<unsigned int>("statusThreshold",3);
   desc.add<bool>("useRecoFlag",false);
+  desc.add<bool>("useConstantThreshold",true);
   desc.add<double>("ampCut_barrel",8.);
   desc.add<double>("ampCut_endcap",12.);
   desc.add<std::string>("phiSymBarrelDigiCollection","phiSymEcalDigisEB");
@@ -75,6 +79,11 @@ HLTEcalPhiSymFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   edm::ESHandle<EcalChannelStatus> csHandle;
   if (! useRecoFlag_) iSetup.get<EcalChannelStatusRcd>().get(csHandle);
   const EcalChannelStatus& channelStatus = *csHandle; 
+
+  //Get PhiSymThreshold from DB
+  edm::ESHandle<EcalPhiSymThresholds> pThres;
+  iSetup.get<EcalPhiSymThresholdsRcd>().get(pThres);
+  const EcalPhiSymThresholds* ithres = pThres.product(); 
 
   Handle<EBDigiCollection> barrelDigisHandle;
   Handle<EEDigiCollection> endcapDigisHandle;
@@ -103,10 +112,12 @@ HLTEcalPhiSymFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   EcalUncalibratedRecHitCollection::const_iterator itunb;
   for (itunb=barrelUncalibRecHitsHandle->begin(); itunb!=barrelUncalibRecHitsHandle->end(); itunb++) {
     EcalUncalibratedRecHit hit = (*itunb);
+    EBDetId hitDetId = hit.id();
     uint16_t statusCode = 0; 
     if (useRecoFlag_) statusCode=(*EBRechits->find(hit.id())).recoFlag();
     else statusCode = channelStatus[itunb->id().rawId()].getStatusCode();
     float amplitude = hit.amplitude();
+    if(!useConstantThreshold_) ampCut_barl_ = ithres->barrel(hitDetId.hashedIndex());
     if( statusCode <=statusThreshold_ && amplitude > ampCut_barl_){
         phiSymEBDigiCollection->push_back((*EBDigis->find(hit.id())).id(),(*EBDigis->find(hit.id())).begin());
     }
@@ -116,10 +127,12 @@ HLTEcalPhiSymFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   EcalUncalibratedRecHitCollection::const_iterator itune;
   for (itune=endcapUncalibRecHitsHandle->begin(); itune!=endcapUncalibRecHitsHandle->end(); itune++) {
     EcalUncalibratedRecHit hit = (*itune);
+    EEDetId hitDetId = hit.id();
     uint16_t statusCode = 0; 
     if (useRecoFlag_) statusCode=(*EERechits->find(hit.id())).recoFlag();
     else statusCode = channelStatus[itune->id().rawId()].getStatusCode();
     float amplitude = hit.amplitude();
+    if(!useConstantThreshold_) ampCut_endc_ = ithres->endcap(hitDetId.hashedIndex());
     if( statusCode <=statusThreshold_ && amplitude > ampCut_endc_){
         phiSymEEDigiCollection->push_back((*EEDigis->find(hit.id())).id(),(*EEDigis->find(hit.id())).begin());
     }

@@ -11,6 +11,7 @@
 #include "CondFormats/EcalObjects/interface/EcalADCToGeVConstant.h"
 #include "CondFormats/EcalObjects/interface/EcalGainRatios.h"
 #include "CondFormats/EcalObjects/interface/EcalMGPAGainRatio.h"
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstants.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstantsMC.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibErrors.h"

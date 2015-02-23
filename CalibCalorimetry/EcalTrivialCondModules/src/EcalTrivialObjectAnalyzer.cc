@@ -25,6 +25,9 @@
 #include "CondFormats/EcalObjects/interface/EcalTBWeights.h"
 #include "CondFormats/DataRecord/interface/EcalTBWeightsRcd.h"
 
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
+#include "CondFormats/DataRecord/interface/EcalPhiSymThresholdsRcd.h"
+
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstants.h"
 #include "CondFormats/DataRecord/interface/EcalIntercalibConstantsRcd.h"
 
@@ -148,6 +151,25 @@ void EcalTrivialObjectAnalyzer::analyze(const edm::Event& e, const edm::EventSet
                << std::endl;
     }
 
+    // PhiSymThresholds
+    edm::ESHandle<EcalPhiSymThresholds> pThres;
+    context.get<EcalPhiSymThresholdsRcd>().get(pThres);
+    const EcalPhiSymThresholds* ithres = pThres.product();
+
+    EcalPhiSymThresholdMap::const_iterator ithresit=ithres->getMap().find(ebid.rawId());
+    EcalPhiSymThreshold ithresval;
+    if( ithresit!=ithres->getMap().end() ){
+      ithresval = (*ithresit);
+
+      std::cout << "EcalPhiSymThreshold: "
+                <<std::setprecision(6)
+                << ithresval
+                << std::endl;
+    } else {
+     std::cout << "No phisymthreshold found for this xtal! something wrong with EcalPhiSymThresholds in your DB? "
+               << std::endl;
+    }
+    
     // Intercalib constants
     edm::ESHandle<EcalIntercalibConstants> pIcal;
     context.get<EcalIntercalibConstantsRcd>().get(pIcal);

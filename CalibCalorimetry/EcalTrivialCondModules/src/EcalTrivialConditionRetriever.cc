@@ -237,7 +237,18 @@ EcalTrivialConditionRetriever::EcalTrivialConditionRetriever( const edm::Paramet
     findingRecord<EcalLinearCorrectionsRcd> () ;
   }
 
+  // phisymthresholds
+  producedEcalPhiSymThresholds_ = ps.getUntrackedParameter<bool>("producedEcalPhiSymThresholds",true);
+  phisymThresholdsFile_ = ps.getUntrackedParameter<std::string>("phisymThresholdsFile","") ;
 
+  if (producedEcalPhiSymThresholds_) { // user asks to produce constants
+    if(phisymThresholdsFile_ != "") {  // if file provided read constants
+        setWhatProduced (this, &EcalTrivialConditionRetriever::getPhiSymThresholdsFromConfiguration ) ;
+    } else { // set all thresholds to 8. (12.) in EB (EE)
+        setWhatProduced (this, &EcalTrivialConditionRetriever::produceEcalPhiSymThresholds ) ;
+    }
+    findingRecord<EcalPhiSymThresholdsRcd> () ;
+  }
 
   // intercalibration constants
   producedEcalIntercalibConstants_ = ps.getUntrackedParameter<bool>("producedEcalIntercalibConstants",true);
@@ -651,6 +662,44 @@ EcalTrivialConditionRetriever::produceEcalLinearCorrections( const EcalLinearCor
   
   return ical;
 
+}
+
+//------------------------------
+
+std::auto_ptr<EcalPhiSymThresholds>
+EcalTrivialConditionRetriever::produceEcalPhiSymThresholds( const EcalPhiSymThresholdsRcd& )
+{
+  std::auto_ptr<EcalPhiSymThresholds>  ithres = std::auto_ptr<EcalPhiSymThresholds>( new EcalPhiSymThresholds() );
+
+  for(int ieta=-EBDetId::MAX_IETA; ieta<=EBDetId::MAX_IETA ;++ieta) {
+    if(ieta==0) continue;
+    for(int iphi=EBDetId::MIN_IPHI; iphi<=EBDetId::MAX_IPHI; ++iphi) {
+      // make an EBDetId since we need EBDetId::rawId() to be used as the key for the pedestals
+      if (EBDetId::validDetId(ieta,iphi))
+	{
+	  EBDetId ebid(ieta,iphi);
+	  ithres->setValue( ebid.rawId(), 8. );
+	}
+    }
+  }
+
+  for(int iX=EEDetId::IX_MIN; iX<=EEDetId::IX_MAX ;++iX) {
+    for(int iY=EEDetId::IY_MIN; iY<=EEDetId::IY_MAX; ++iY) {
+      // make an EEDetId since we need EEDetId::rawId() to be used as the key for the pedestals
+      if (EEDetId::validDetId(iX,iY,1))
+	{
+	  EEDetId eedetidpos(iX,iY,1);
+	  ithres->setValue( eedetidpos.rawId(), 12. );
+	}
+      if(EEDetId::validDetId(iX,iY,-1))
+        {
+	  EEDetId eedetidneg(iX,iY,-1);
+	  ithres->setValue( eedetidneg.rawId(), 12. );
+	}
+    }
+  }
+
+  return ithres;
 }
 
 //------------------------------
@@ -2322,6 +2371,45 @@ EcalTrivialConditionRetriever::produceEcalTrgChannelStatus( const EcalTPGCrystal
 }
 
 
+std::auto_ptr<EcalPhiSymThresholds>
+EcalTrivialConditionRetriever::getPhiSymThresholdsFromConfiguration ( const EcalPhiSymThresholdsRcd& )
+{
+  std::auto_ptr<EcalPhiSymThresholds>  ithres = std::auto_ptr<EcalPhiSymThresholds>( new EcalPhiSymThresholds() );
+
+  // Read the values from a txt file
+  // -------------------------------
+
+  edm::LogInfo("EcalTrivialConditionRetriever") << "Reading physymthresholds from file "
+                                                << phisymThresholdsFile_.c_str() ;
+  std::ifstream f;
+  f.open(phisymThresholdsFile_.c_str());
+
+  int iline = 0;
+  int ieta, iphi, iz;
+  double ADCthres;
+
+  while(f >> ieta >> iphi >> iz >> ADCthres)
+  {
+        iline++;
+        if(iline <= 61200){
+           // make an EBDetId since we need EBDetId::rawId() to be used as the key for the pedestals
+           if (EBDetId::validDetId(ieta,iphi))
+	     {
+	       EBDetId ebid(ieta,iphi);
+	       ithres->setValue( ebid.rawId(), ADCthres );
+	     }
+        }else{
+           // make an EEDetId since we need EEDetId::rawId() to be used as the key for the pedestals
+           if (EEDetId::validDetId(ieta,iphi,iz))
+	     {
+	       EEDetId eedetidpos(ieta,iphi,iz);
+	       ithres->setValue( eedetidpos.rawId(), ADCthres );
+	     }
+        }
+  }
+  
+  return ithres;
+}
 
 
 std::auto_ptr<EcalIntercalibConstants> 
