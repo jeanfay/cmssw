@@ -48,5 +48,6 @@
 <use   name="Geometry/EcalAlgo"/>
 <use   name="SimGeneral/HepPDTRecord"/>
 <use   name="TrackingTools/TransientTrack"/>
+<use   name="Calibration/Tools"/>
 
 <flags   EDM_PLUGIN="1"/>

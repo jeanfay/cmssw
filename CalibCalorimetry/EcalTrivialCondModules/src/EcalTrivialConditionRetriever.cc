@@ -671,34 +671,16 @@ EcalTrivialConditionRetriever::produceEcalPhiSymThresholds( const EcalPhiSymThre
 {
   std::auto_ptr<EcalPhiSymThresholds>  ithres = std::auto_ptr<EcalPhiSymThresholds>( new EcalPhiSymThresholds() );
 
-  for(int ieta=-EBDetId::MAX_IETA; ieta<=EBDetId::MAX_IETA ;++ieta) {
-    if(ieta==0) continue;
-    for(int iphi=EBDetId::MIN_IPHI; iphi<=EBDetId::MAX_IPHI; ++iphi) {
-      // make an EBDetId since we need EBDetId::rawId() to be used as the key for the pedestals
-      if (EBDetId::validDetId(ieta,iphi))
-	{
-	  EBDetId ebid(ieta,iphi);
-	  ithres->setValue( ebid.rawId(), 8. );
-	}
-    }
-  }
-
-  for(int iX=EEDetId::IX_MIN; iX<=EEDetId::IX_MAX ;++iX) {
-    for(int iY=EEDetId::IY_MIN; iY<=EEDetId::IY_MAX; ++iY) {
-      // make an EEDetId since we need EEDetId::rawId() to be used as the key for the pedestals
-      if (EEDetId::validDetId(iX,iY,1))
-	{
-	  EEDetId eedetidpos(iX,iY,1);
-	  ithres->setValue( eedetidpos.rawId(), 12. );
-	}
-      if(EEDetId::validDetId(iX,iY,-1))
-        {
-	  EEDetId eedetidneg(iX,iY,-1);
-	  ithres->setValue( eedetidneg.rawId(), 12. );
-	}
-    }
-  }
-
+  for(int iring=0; iring<N_RING_BARREL ;++iring) { 
+      
+       ithres->setValue( (short)iring, 8. );
+  } 
+   
+  for(int iring=N_RING_BARREL; iring<N_RING_TOTAL ;++iring) { 
+      
+       ithres->setValue( (short)iring, 12. );
+  } 
+  
   return ithres;
 }
 
@@ -2384,28 +2366,12 @@ EcalTrivialConditionRetriever::getPhiSymThresholdsFromConfiguration ( const Ecal
   std::ifstream f;
   f.open(phisymThresholdsFile_.c_str());
 
-  int iline = 0;
-  int ieta, iphi, iz;
-  double ADCthres;
+  int iring;
+  float ADCthres;
 
-  while(f >> ieta >> iphi >> iz >> ADCthres)
+  while(f >> iring >> ADCthres)
   {
-        iline++;
-        if(iline <= 61200){
-           // make an EBDetId since we need EBDetId::rawId() to be used as the key for the pedestals
-           if (EBDetId::validDetId(ieta,iphi))
-	     {
-	       EBDetId ebid(ieta,iphi);
-	       ithres->setValue( ebid.rawId(), ADCthres );
-	     }
-        }else{
-           // make an EEDetId since we need EEDetId::rawId() to be used as the key for the pedestals
-           if (EEDetId::validDetId(ieta,iphi,iz))
-	     {
-	       EEDetId eedetidpos(ieta,iphi,iz);
-	       ithres->setValue( eedetidpos.rawId(), ADCthres );
-	     }
-        }
+        ithres->setValue( (short)iring, ADCthres );
   }
   
   return ithres;

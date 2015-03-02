@@ -18,7 +18,7 @@ EcalTrivialConditionRetriever = cms.ESSource("EcalTrivialConditionRetriever",
     #       If set true reading optimized weights (3+5 weights) from file 
     getWeightsFromFile = cms.untracked.bool(True),
     producedEcalPhiSymThresholds = cms.untracked.bool(True),
-    phisymThresholdsFile = cms.untracked.string('/afs/cern.ch/work/b/bmarzocc/public/Pedestals_DB/thresholds_208626_208943_g12.txt'),
+    phisymThresholdsFile = cms.untracked.string(''),
     intercalibErrorsFile = cms.untracked.string(''),
     laserAPDPNMean = cms.untracked.double(1.0),
     laserAPDPNRefMean = cms.untracked.double(1.0),

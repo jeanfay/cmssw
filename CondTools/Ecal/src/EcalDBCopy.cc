@@ -289,12 +289,12 @@ void EcalDBCopy::copyToDB(const edm::EventSetup& evtSetup, std::string container
 
    dbOutput->createNewIOV<const EcalTPGCrystalStatus>( new EcalTPGCrystalStatus(*obj),dbOutput->beginOfTime(), dbOutput->endOfTime(),recordName);
    
-  } else if (container == "EcalPhiSymThresholds") {
+  /*} else if (container == "EcalPhiSymThresholds") {
     edm::ESHandle<EcalPhiSymThresholds> handle;
     evtSetup.get<EcalPhiSymThresholdsRcd>().get(handle);
     const EcalPhiSymThresholds* obj = handle.product();
     std::cout << "inter pointer is: "<< obj<< std::endl;
-   dbOutput->createNewIOV<const EcalPhiSymThresholds>( new EcalPhiSymThresholds(*obj),dbOutput->beginOfTime(), dbOutput->endOfTime(),recordName);
+   dbOutput->createNewIOV<const EcalPhiSymThresholds>( new EcalPhiSymThresholds(*obj),dbOutput->beginOfTime(), dbOutput->endOfTime(),recordName);*/
 
   } else if (container == "EcalIntercalibConstants") {
     edm::ESHandle<EcalIntercalibConstants> handle;

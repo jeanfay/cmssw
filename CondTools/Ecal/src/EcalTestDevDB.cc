@@ -121,7 +121,7 @@ void EcalTestDevDB::analyze( const edm::Event& evt, const edm::EventSetup& evtSe
 	  dbOutput->appendSinceTime<const EcalADCToGeVConstant>( condObject, irun , recordName);
 	}
 	
-      } else if (container == "EcalPhiSymThresholds") {
+      /*} else if (container == "EcalPhiSymThresholds") {
 	EcalPhiSymThresholds* condObject= generateEcalPhiSymThresholds();
 	if(irun==m_firstRun && dbOutput->isNewTagRequest(recordName)) {
 	  // create new
@@ -131,7 +131,7 @@ void EcalTestDevDB::analyze( const edm::Event& evt, const edm::EventSetup& evtSe
 	  // append
 	  std::cout<<"Old One "<<std::endl;
 	  dbOutput->appendSinceTime<const EcalPhiSymThresholds>( condObject, irun , recordName);
-	}	
+	}*/	
       } else if (container == "EcalIntercalibConstants") {
 	EcalIntercalibConstants* condObject= generateEcalIntercalibConstants();
 	if(irun==m_firstRun && dbOutput->isNewTagRequest(recordName)) {
@@ -274,23 +274,18 @@ EcalTestDevDB::generateEcalADCToGeVConstant() {
 }
 
 //-------------------------------------------------------------
-EcalPhiSymThresholds*
+/*EcalPhiSymThresholds*
 EcalTestDevDB::generateEcalPhiSymThresholds() {
 //-------------------------------------------------------------
 
   EcalPhiSymThresholds* ithres = new EcalPhiSymThresholds();
 
-  for(int ieta=-EBDetId::MAX_IETA; ieta<=EBDetId::MAX_IETA; ++ieta) {
-    if(ieta==0) continue;
-    for(int iphi=EBDetId::MIN_IPHI; iphi<=EBDetId:: MAX_IPHI; ++iphi) {
-
-      EBDetId ebid(ieta,iphi);
-
-      ithres->setValue( ebid.rawId(), 8. );
-    } // loop over phi
-  } // loop over eta
+  for(int iring=0; iring<N_RING_BARREL ;++iring) { 
+      
+       ithres->setValue( (short)iring, 8. );
+  } 
   return ithres;
-}
+}*/
 
 
 

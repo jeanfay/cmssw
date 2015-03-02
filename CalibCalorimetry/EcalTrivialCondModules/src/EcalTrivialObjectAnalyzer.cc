@@ -78,6 +78,11 @@
 
 #include "CLHEP/Matrix/Matrix.h"
 
+#include "Calibration/Tools/interface/EcalRingCalibrationTools.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
+
 using namespace std;
 
 void EcalTrivialObjectAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& context)
@@ -151,12 +156,18 @@ void EcalTrivialObjectAnalyzer::analyze(const edm::Event& e, const edm::EventSet
                << std::endl;
     }
 
+    // Get iRing
+    edm::ESHandle<CaloGeometry> pG;
+    context.get<CaloGeometryRecord>().get(pG);
+    EcalRingCalibrationTools::setCaloGeometry(&(*pG)); 
+    EcalRingCalibrationTools CalibRing;
+    
     // PhiSymThresholds
     edm::ESHandle<EcalPhiSymThresholds> pThres;
     context.get<EcalPhiSymThresholdsRcd>().get(pThres);
     const EcalPhiSymThresholds* ithres = pThres.product();
 
-    EcalPhiSymThresholdMap::const_iterator ithresit=ithres->getMap().find(ebid.rawId());
+    EcalPhiSymThresholdMap::const_iterator ithresit=ithres->getMap().find(CalibRing.getRingIndex(ebid));
     EcalPhiSymThreshold ithresval;
     if( ithresit!=ithres->getMap().end() ){
       ithresval = (*ithresit);

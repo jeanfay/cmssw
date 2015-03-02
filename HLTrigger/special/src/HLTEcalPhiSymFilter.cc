@@ -9,6 +9,10 @@
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
+#include "Calibration/Tools/interface/EcalRingCalibrationTools.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 
 
 HLTEcalPhiSymFilter::HLTEcalPhiSymFilter(const edm::ParameterSet& iConfig)
@@ -85,6 +89,12 @@ HLTEcalPhiSymFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iSetup.get<EcalPhiSymThresholdsRcd>().get(pThres);
   const EcalPhiSymThresholds* ithres = pThres.product(); 
 
+  //Get iRing-geometry 
+  edm::ESHandle<CaloGeometry> pG;
+  iSetup.get<CaloGeometryRecord>().get(pG);
+  EcalRingCalibrationTools::setCaloGeometry(&(*pG)); 
+  EcalRingCalibrationTools CalibRing;
+
   Handle<EBDigiCollection> barrelDigisHandle;
   Handle<EEDigiCollection> endcapDigisHandle;
   Handle<EcalUncalibratedRecHitCollection> barrelUncalibRecHitsHandle;
@@ -117,7 +127,8 @@ HLTEcalPhiSymFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if (useRecoFlag_) statusCode=(*EBRechits->find(hit.id())).recoFlag();
     else statusCode = channelStatus[itunb->id().rawId()].getStatusCode();
     float amplitude = hit.amplitude();
-    if(!useConstantThreshold_) ampCut_barl_ = ithres->barrel(hitDetId.hashedIndex());
+    if(!useConstantThreshold_) ampCut_barl_ = ithres->barrel(CalibRing.getRingIndex(hitDetId));
+    std::cout << CalibRing.getRingIndex(hitDetId) << " - " << ithres->barrel(CalibRing.getRingIndex(hitDetId)) << std::endl;
     if( statusCode <=statusThreshold_ && amplitude > ampCut_barl_){
         phiSymEBDigiCollection->push_back((*EBDigis->find(hit.id())).id(),(*EBDigis->find(hit.id())).begin());
     }
@@ -132,7 +143,7 @@ HLTEcalPhiSymFilter::filter(edm::Event& iEvent, const edm::EventSetup& iSetup)
     if (useRecoFlag_) statusCode=(*EERechits->find(hit.id())).recoFlag();
     else statusCode = channelStatus[itune->id().rawId()].getStatusCode();
     float amplitude = hit.amplitude();
-    if(!useConstantThreshold_) ampCut_endc_ = ithres->endcap(hitDetId.hashedIndex());
+    if(!useConstantThreshold_) ampCut_endc_ = ithres->endcap(CalibRing.getRingIndex(hitDetId));
     if( statusCode <=statusThreshold_ && amplitude > ampCut_endc_){
         phiSymEEDigiCollection->push_back((*EEDigis->find(hit.id())).id(),(*EEDigis->find(hit.id())).begin());
     }

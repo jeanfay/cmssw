@@ -5,10 +5,10 @@
  * Created: 22 Feb 2006
  * $Id: EcalIntercalibConstants.h,v 1.3 2007/09/27 09:42:55 ferriff Exp $
  **/
-#include "CondFormats/EcalObjects/interface/EcalCondObjectContainer.h"
+#include "CondFormats/EcalObjects/interface/EcalCondObjectRingContainer.h"
 
 typedef float EcalPhiSymThreshold;
-typedef EcalFloatCondObjectContainer EcalPhiSymThresholdMap;
+typedef EcalFloatCondObjectRingContainer EcalPhiSymThresholdMap;
 typedef EcalPhiSymThresholdMap EcalPhiSymThresholds;
 
 
