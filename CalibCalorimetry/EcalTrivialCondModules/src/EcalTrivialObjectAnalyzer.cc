@@ -25,6 +25,9 @@
 #include "CondFormats/EcalObjects/interface/EcalTBWeights.h"
 #include "CondFormats/DataRecord/interface/EcalTBWeightsRcd.h"
 
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
+#include "CondFormats/DataRecord/interface/EcalPhiSymThresholdsRcd.h"
+
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstants.h"
 #include "CondFormats/DataRecord/interface/EcalIntercalibConstantsRcd.h"
 
@@ -74,6 +77,11 @@
 #include "CondFormats/DataRecord/interface/EcalSampleMaskRcd.h"
 
 #include "CLHEP/Matrix/Matrix.h"
+
+#include "Calibration/Tools/interface/EcalRingCalibrationTools.h"
+#include "Geometry/CaloGeometry/interface/CaloSubdetectorGeometry.h"
+#include "Geometry/CaloGeometry/interface/CaloGeometry.h"
+#include "Geometry/Records/interface/CaloGeometryRecord.h"
 
 using namespace std;
 
@@ -148,6 +156,31 @@ void EcalTrivialObjectAnalyzer::analyze(const edm::Event& e, const edm::EventSet
                << std::endl;
     }
 
+    // Get iRing
+    edm::ESHandle<CaloGeometry> pG;
+    context.get<CaloGeometryRecord>().get(pG);
+    EcalRingCalibrationTools::setCaloGeometry(&(*pG)); 
+    EcalRingCalibrationTools CalibRing;
+    
+    // PhiSymThresholds
+    edm::ESHandle<EcalPhiSymThresholds> pThres;
+    context.get<EcalPhiSymThresholdsRcd>().get(pThres);
+    const EcalPhiSymThresholds* ithres = pThres.product();
+
+    EcalPhiSymThresholdMap::const_iterator ithresit=ithres->getMap().find(CalibRing.getRingIndex(ebid));
+    EcalPhiSymThreshold ithresval;
+    if( ithresit!=ithres->getMap().end() ){
+      ithresval = (*ithresit);
+
+      std::cout << "EcalPhiSymThreshold: "
+                <<std::setprecision(6)
+                << ithresval
+                << std::endl;
+    } else {
+     std::cout << "No phisymthreshold found for this xtal! something wrong with EcalPhiSymThresholds in your DB? "
+               << std::endl;
+    }
+    
     // Intercalib constants
     edm::ESHandle<EcalIntercalibConstants> pIcal;
     context.get<EcalIntercalibConstantsRcd>().get(pIcal);

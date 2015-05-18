@@ -162,6 +162,7 @@
 </class>
 <!-- typedefs for EcalCondObjectContainer -->
 <class name="EcalFloatCondObjectContainer"/>
+<class name="EcalPhiSymThresholds"/>
 <class name="EcalIntercalibConstants"/>
 <class name="EcalIntercalibConstantsMC"/>
 <class name="EcalIntercalibErrors"/>

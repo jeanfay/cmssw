@@ -50,26 +50,31 @@ namespace edm {
 //
 
 class HLTEcalPhiSymFilter : public edm::global::EDFilter<> {
-public:
-  HLTEcalPhiSymFilter(const edm::ParameterSet&);
+ public:
+  explicit HLTEcalPhiSymFilter(const edm::ParameterSet&);
   ~HLTEcalPhiSymFilter();
-
-  virtual bool filter(edm::StreamID, edm::Event & event, const edm::EventSetup & setup) const override final;
+  virtual bool filter(edm::Event &, const edm::EventSetup&);
   static void fillDescriptions(edm::ConfigurationDescriptions & descriptions);
-
-private:
-  const edm::EDGetTokenT<EBDigiCollection> barrelDigisToken_;
-  const edm::EDGetTokenT<EEDigiCollection> endcapDigisToken_;
-  const edm::EDGetTokenT<EcalUncalibratedRecHitCollection> barrelUncalibHitsToken_;
-  const edm::EDGetTokenT<EcalUncalibratedRecHitCollection> endcapUncalibHitsToken_;
-  const edm::EDGetTokenT<EBRecHitCollection> barrelHitsToken_;
-  const edm::EDGetTokenT<EERecHitCollection> endcapHitsToken_;
-  const std::string phiSymBarrelDigis_;
-  const std::string phiSymEndcapDigis_;
-  const double ampCut_barl_;
-  const double ampCut_endc_; 
-  const uint32_t statusThreshold_; ///< accept channels with up to this status
-  const bool   useRecoFlag_;       ///< use recoflag instead of DB for bad channels
+ private:
+  // ----------member data ---------------------------
+  edm::EDGetTokenT<EBDigiCollection> barrelDigisToken_;
+  edm::EDGetTokenT<EEDigiCollection> endcapDigisToken_;
+  edm::EDGetTokenT<EcalUncalibratedRecHitCollection> barrelUncalibHitsToken_;
+  edm::EDGetTokenT<EcalUncalibratedRecHitCollection> endcapUncalibHitsToken_;
+  edm::EDGetTokenT<EBRecHitCollection> barrelHitsToken_;
+  edm::EDGetTokenT<EERecHitCollection> endcapHitsToken_;
+  edm::InputTag barrelDigis_;
+  edm::InputTag endcapDigis_;
+  edm::InputTag barrelUncalibHits_;
+  edm::InputTag endcapUncalibHits_;
+  edm::InputTag barrelHits_;
+  edm::InputTag endcapHits_;
+  std::string phiSymBarrelDigis_;
+  std::string phiSymEndcapDigis_;
+  double ampCut_barl_;
+  double ampCut_endc_;
+  uint32_t statusThreshold_; ///< accept channels with up to this status
+  bool useRecoFlag_; ///< use recoflag instead of DB for bad channels
+  bool useConstantThreshold_; ///< use constant threshold instead of DB one
 };
-
 #endif

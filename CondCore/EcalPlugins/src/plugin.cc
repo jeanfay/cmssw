@@ -36,7 +36,8 @@
 #include "CondFormats/DataRecord/interface/EcalLinearCorrectionsRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalTimeDependentCorrections.h"
 
-
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
+#include "CondFormats/DataRecord/interface/EcalPhiSymThresholdsRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstants.h"
 #include "CondFormats/DataRecord/interface/EcalIntercalibConstantsRcd.h"
 
@@ -159,6 +160,7 @@ REGISTER_PLUGIN(EcalWeightXtalGroupsRcd,EcalWeightXtalGroups);
 REGISTER_PLUGIN(EcalTBWeightsRcd,EcalTBWeights);
 REGISTER_PLUGIN(EcalGainRatiosRcd,EcalGainRatios);
 REGISTER_PLUGIN(EcalLinearCorrectionsRcd,EcalLinearCorrections);
+REGISTER_PLUGIN(EcalPhiSymThresholdsRcd,EcalFloatCondObjectContainer);
 REGISTER_PLUGIN(EcalIntercalibConstantsRcd,EcalFloatCondObjectContainer);
 REGISTER_PLUGIN(EcalIntercalibConstantsMCRcd,EcalFloatCondObjectContainer);
 REGISTER_PLUGIN(EcalTimeCalibConstantsRcd,EcalFloatCondObjectContainer);

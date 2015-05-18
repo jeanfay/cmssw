@@ -12,6 +12,8 @@
 #include "CondFormats/DataRecord/interface/EcalADCToGeVConstantRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalLinearCorrections.h"
 #include "CondFormats/DataRecord/interface/EcalLinearCorrectionsRcd.h"
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
+#include "CondFormats/DataRecord/interface/EcalPhiSymThresholdsRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstants.h"
 #include "CondFormats/DataRecord/interface/EcalIntercalibConstantsRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalGainRatios.h"
@@ -47,6 +49,7 @@ class  EcalTestDevDB : public edm::EDAnalyzer {
 
   EcalPedestals* generateEcalPedestals();
   EcalADCToGeVConstant* generateEcalADCToGeVConstant();
+  EcalPhiSymThresholds* generateEcalPhiSymThresholds();
   EcalIntercalibConstants* generateEcalIntercalibConstants();
   EcalLinearCorrections* generateEcalLinearCorrections();
   EcalGainRatios* generateEcalGainRatios();

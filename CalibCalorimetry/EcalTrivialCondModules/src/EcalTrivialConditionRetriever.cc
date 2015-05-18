@@ -237,7 +237,18 @@ EcalTrivialConditionRetriever::EcalTrivialConditionRetriever( const edm::Paramet
     findingRecord<EcalLinearCorrectionsRcd> () ;
   }
 
+  // phisymthresholds
+  producedEcalPhiSymThresholds_ = ps.getUntrackedParameter<bool>("producedEcalPhiSymThresholds",true);
+  phisymThresholdsFile_ = ps.getUntrackedParameter<std::string>("phisymThresholdsFile","") ;
 
+  if (producedEcalPhiSymThresholds_) { // user asks to produce constants
+    if(phisymThresholdsFile_ != "") {  // if file provided read constants
+        setWhatProduced (this, &EcalTrivialConditionRetriever::getPhiSymThresholdsFromConfiguration ) ;
+    } else { // set all thresholds to 8. (12.) in EB (EE)
+        setWhatProduced (this, &EcalTrivialConditionRetriever::produceEcalPhiSymThresholds ) ;
+    }
+    findingRecord<EcalPhiSymThresholdsRcd> () ;
+  }
 
   // intercalibration constants
   producedEcalIntercalibConstants_ = ps.getUntrackedParameter<bool>("producedEcalIntercalibConstants",true);
@@ -651,6 +662,26 @@ EcalTrivialConditionRetriever::produceEcalLinearCorrections( const EcalLinearCor
   
   return ical;
 
+}
+
+//------------------------------
+
+std::auto_ptr<EcalPhiSymThresholds>
+EcalTrivialConditionRetriever::produceEcalPhiSymThresholds( const EcalPhiSymThresholdsRcd& )
+{
+  std::auto_ptr<EcalPhiSymThresholds>  ithres = std::auto_ptr<EcalPhiSymThresholds>( new EcalPhiSymThresholds() );
+
+  for(int iring=0; iring<N_RING_BARREL ;++iring) { 
+      
+       ithres->setValue( (short)iring, 8. );
+  } 
+   
+  for(int iring=N_RING_BARREL; iring<N_RING_TOTAL ;++iring) { 
+      
+       ithres->setValue( (short)iring, 12. );
+  } 
+  
+  return ithres;
 }
 
 //------------------------------
@@ -2322,6 +2353,29 @@ EcalTrivialConditionRetriever::produceEcalTrgChannelStatus( const EcalTPGCrystal
 }
 
 
+std::auto_ptr<EcalPhiSymThresholds>
+EcalTrivialConditionRetriever::getPhiSymThresholdsFromConfiguration ( const EcalPhiSymThresholdsRcd& )
+{
+  std::auto_ptr<EcalPhiSymThresholds>  ithres = std::auto_ptr<EcalPhiSymThresholds>( new EcalPhiSymThresholds() );
+
+  // Read the values from a txt file
+  // -------------------------------
+
+  edm::LogInfo("EcalTrivialConditionRetriever") << "Reading physymthresholds from file "
+                                                << phisymThresholdsFile_.c_str() ;
+  std::ifstream f;
+  f.open(phisymThresholdsFile_.c_str());
+
+  int iring;
+  float ADCthres;
+
+  while(f >> iring >> ADCthres)
+  {
+        ithres->setValue( (short)iring, ADCthres );
+  }
+  
+  return ithres;
+}
 
 
 std::auto_ptr<EcalIntercalibConstants> 

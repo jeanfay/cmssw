@@ -19,6 +19,8 @@
 #include "CondFormats/DataRecord/interface/EcalChannelStatusRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalLinearCorrections.h"
 #include "CondFormats/DataRecord/interface/EcalLinearCorrectionsRcd.h"
+#include "CondFormats/EcalObjects/interface/EcalPhiSymThresholds.h"
+#include "CondFormats/DataRecord/interface/EcalPhiSymThresholdsRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstants.h"
 #include "CondFormats/DataRecord/interface/EcalIntercalibConstantsRcd.h"
 #include "CondFormats/EcalObjects/interface/EcalIntercalibConstantsMC.h"
@@ -132,6 +134,8 @@ bool EcalDBCopy::shouldCopy(const edm::EventSetup& evtSetup, std::string contain
     cacheID = evtSetup.get<EcalADCToGeVConstantRcd>().cacheIdentifier();
   } else if (container == "EcalLinearCorrections") {
     cacheID = evtSetup.get<EcalLinearCorrectionsRcd>().cacheIdentifier();
+  } else if (container == "EcalPhiSymThresholds") {
+    cacheID = evtSetup.get<EcalPhiSymThresholdsRcd>().cacheIdentifier();
   } else if (container == "EcalIntercalibConstants") {
     cacheID = evtSetup.get<EcalIntercalibConstantsRcd>().cacheIdentifier();
   } else if (container == "EcalIntercalibConstantsMC") {
@@ -284,7 +288,13 @@ void EcalDBCopy::copyToDB(const edm::EventSetup& evtSetup, std::string container
     std::cout << "TPG channel status pointer is: "<< obj<< std::endl;
 
    dbOutput->createNewIOV<const EcalTPGCrystalStatus>( new EcalTPGCrystalStatus(*obj),dbOutput->beginOfTime(), dbOutput->endOfTime(),recordName);
-
+   
+  /*} else if (container == "EcalPhiSymThresholds") {
+    edm::ESHandle<EcalPhiSymThresholds> handle;
+    evtSetup.get<EcalPhiSymThresholdsRcd>().get(handle);
+    const EcalPhiSymThresholds* obj = handle.product();
+    std::cout << "inter pointer is: "<< obj<< std::endl;
+   dbOutput->createNewIOV<const EcalPhiSymThresholds>( new EcalPhiSymThresholds(*obj),dbOutput->beginOfTime(), dbOutput->endOfTime(),recordName);*/
 
   } else if (container == "EcalIntercalibConstants") {
     edm::ESHandle<EcalIntercalibConstants> handle;

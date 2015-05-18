@@ -121,7 +121,17 @@ void EcalTestDevDB::analyze( const edm::Event& evt, const edm::EventSetup& evtSe
 	  dbOutput->appendSinceTime<const EcalADCToGeVConstant>( condObject, irun , recordName);
 	}
 	
-	
+      /*} else if (container == "EcalPhiSymThresholds") {
+	EcalPhiSymThresholds* condObject= generateEcalPhiSymThresholds();
+	if(irun==m_firstRun && dbOutput->isNewTagRequest(recordName)) {
+	  // create new
+	  std::cout<<"First One "<<std::endl;
+	  dbOutput->createNewIOV<const EcalPhiSymThresholds>( condObject, dbOutput->beginOfTime(),dbOutput->endOfTime() ,recordName);
+	} else {
+	  // append
+	  std::cout<<"Old One "<<std::endl;
+	  dbOutput->appendSinceTime<const EcalPhiSymThresholds>( condObject, irun , recordName);
+	}*/	
       } else if (container == "EcalIntercalibConstants") {
 	EcalIntercalibConstants* condObject= generateEcalIntercalibConstants();
 	if(irun==m_firstRun && dbOutput->isNewTagRequest(recordName)) {
@@ -262,6 +272,22 @@ EcalTestDevDB::generateEcalADCToGeVConstant() {
   EcalADCToGeVConstant* agc = new EcalADCToGeVConstant(36.+r*4., 60.+r*4);
   return agc;
 }
+
+//-------------------------------------------------------------
+/*EcalPhiSymThresholds*
+EcalTestDevDB::generateEcalPhiSymThresholds() {
+//-------------------------------------------------------------
+
+  EcalPhiSymThresholds* ithres = new EcalPhiSymThresholds();
+
+  for(int iring=0; iring<N_RING_BARREL ;++iring) { 
+      
+       ithres->setValue( (short)iring, 8. );
+  } 
+  return ithres;
+}*/
+
+
 
 //-------------------------------------------------------------
 EcalIntercalibConstants*
